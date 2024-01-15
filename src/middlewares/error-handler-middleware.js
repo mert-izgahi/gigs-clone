@@ -1,4 +1,4 @@
-import BaseError from "../errors/base-error";
+import BaseError from "../errors/base-error.js";
 
 const errorHandler = (error, req, res, next) => {
     const baseError = new BaseError(error.message, error.status);
