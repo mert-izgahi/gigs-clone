@@ -294,3 +294,21 @@ const userSchema = new mongoose.Schema(
 
 export default mongoose.model("User", userSchema);
 ```
+
+### Password Hashing
+
+using bcryptjs to hash password.
+
+```js
+import bcryptjs from "bcryptjs";
+userSchema.pre("save", async function (next) {
+    if (this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, config.SALT_ROUNDS);
+    }
+    next();
+});
+
+userSchema.methods.isValidPassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
+};
+```
