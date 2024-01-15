@@ -220,3 +220,34 @@ export const withAuth = (func) => {
     };
 };
 ```
+
+```js
+// ./src/middlewares/error-handler-middleware.js
+import BaseError from "../errors/base-error";
+
+const errorHandler = (error, req, res, next) => {
+    const baseError = new BaseError(error.message, error.status);
+
+    return res.status(baseError.status).json({
+        data: null,
+        error: {
+            name: baseError.name,
+            message: baseError.message,
+        },
+    });
+};
+
+export default errorHandler;
+```
+
+```js
+// ./src/middlewares/not-found-middleware.js
+import NotFoundError from "../errors/not-found-error";
+
+const notFound = (req, res, next) => {
+    const error = new NotFoundError(`Not Found - ${req.originalUrl}`);
+    next(error);
+};
+
+export default notFound;
+```
