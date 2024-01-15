@@ -37,7 +37,8 @@ dotenv.config();
     ├── config.js
     └── src/
         ├── middlewares/
-        │   ├── serialize-user-middlware.js
+        |   ├── async-wrapper-middleware.js
+        │   ├── serialize-user-middleware.js
         │   ├── with-auth-middleware.js
         │   ├── error-handler-middleware.js
         │   ├── not-found-middleware.js
@@ -152,4 +153,70 @@ class BadRequestError extends BaseError {
 }
 
 export default BadRequestError;
+```
+
+### SETUP MIDDLEWARES
+
+to setup middlewares we need to create async-wrapper-middleware, serialize-user-middleware, with-auth-middleware, error-handler-middleware, not-found-middleware in middlewares folder.
+
+```js
+// ./src/middlewares/async-wrapper-middleware.js
+export default (func) => {
+    return async (req, res, next) => {
+        try {
+            await func(req, res, next);
+        } catch (error) {
+            next(error);
+        }
+    };
+};
+```
+
+```js
+./src/middlewares/serialize-user-middleware.js
+import jwt from "jsonwebtoken";
+import config from "../../config.js";
+export const serializeUser = (req, res, next) => {
+    try {
+        const headers = req.headers;
+
+        const authorization = headers.authorization;
+
+        if (!authorization) {
+            return next();
+        }
+
+        const token = authorization.split(" ")[1];
+
+        if (!token) {
+            return next();
+        }
+
+        const decoded = jwt.verify(token, config.JWT_SECRET);
+
+        res.locals.user = decoded;
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+```
+
+```js
+// ./src/middlewares/with-auth-middleware.js
+import AuthenticationError from "../errors/authentication-error";
+
+export const withAuth = (func) => {
+    return (req, res, next) => {
+        const user = res.locals.user;
+
+        if (!user) {
+            throw new AuthenticationError(
+                "Invalid token. Please log in again."
+            );
+        }
+
+        next();
+    };
+};
 ```
