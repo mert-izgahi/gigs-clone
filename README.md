@@ -312,3 +312,29 @@ userSchema.methods.isValidPassword = async function (password) {
     return await bcrypt.compare(password, this.password);
 };
 ```
+
+### Generate Auth Token
+
+```js
+// ./src/services/users/model.js
+import jwt from "jsonwebtoken";
+userSchema.methods.getSignedJwtToken = function () {
+    return jwt.sign({ id: this._id }, config.JWT_SECRET, {
+        expiresIn: config.JWT_EXPIRY,
+    });
+};
+```
+
+### User PasswordRestToken setup
+
+```js
+userSchema.methods.getResetPasswordToken = function () {
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    this.resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest("hex");
+    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 min
+    return resetToken;
+};
+```
