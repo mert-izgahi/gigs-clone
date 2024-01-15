@@ -251,3 +251,46 @@ const notFound = (req, res, next) => {
 
 export default notFound;
 ```
+
+### Build User Model
+
+to start models,first we will build user model, which include name, email, password and role. also , jobTitle, bio properties, and timestamps. to track creation and update date.
+
+```js
+// ./src/services/users/model.js
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+        },
+        email: {
+            type: String,
+            required: true,
+        },
+        password: {
+            type: String,
+            required: true,
+        },
+        image: {
+            type: String,
+            default: null,
+        },
+        jobTitle: {
+            type: String,
+            default: null,
+        },
+        bio: {
+            type: String,
+            default: null,
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+export default mongoose.model("User", userSchema);
+```
