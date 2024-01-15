@@ -93,3 +93,63 @@ export default async function connectDB(connectionString) {
     }
 }
 ```
+
+### SETUP ERROR CLASSES
+
+to setup error classes we need to create base-error, authentication-error, not-found-error, bad-request-error in errors folder.
+
+```js
+// ./src/errors/base-error.js
+
+class BaseError extends Error {
+    constructor(message, status) {
+        super(message);
+        this.status = status;
+        this.name = this.constructor.name;
+    }
+}
+
+export default BaseError;
+```
+
+```js
+// ./src/errors/authentication-error.js
+
+import BaseError from "./base-error";
+
+class AuthenticationError extends BaseError {
+    constructor(message) {
+        super(message, 401);
+    }
+}
+
+export default AuthenticationError;
+```
+
+```js
+// ./src/errors/not-found-error.js
+
+import BaseError from "./base-error";
+
+class NotFoundError extends BaseError {
+    constructor(message) {
+        super(message, 404);
+    }
+}
+
+export default NotFoundError;
+```
+
+```js
+// ./src/errors/bad-request-error.js
+
+import BaseError from "./base-error";
+
+class BadRequestError extends BaseError {
+    constructor(message) {
+        super(message, 400);
+    }
+}
+
+export default BadRequestError;
+```
