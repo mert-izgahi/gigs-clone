@@ -690,3 +690,31 @@ class MailSender {
     }
 }
 ```
+
+```js
+// ./src/services/users/model.js
+userSchema.methods.getResetPasswordToken = function () {
+    const resetToken = crypto.randomBytes(20).toString("hex");
+    this.resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(resetToken)
+        .digest("hex");
+    this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 min
+    return resetToken;
+};
+userSchema.statics.getByRestToken = async function (token) {
+    // decode token
+    const decodedToken = await crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+    const user = await this.findOne({
+        resetPasswordToken: decodedToken,
+        resetPasswordExpire: { $gt: Date.now() },
+    });
+    if (!user) {
+        throw new BadRequestError("Invalid token, please try again");
+    }
+    return user;
+};
+```

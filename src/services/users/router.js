@@ -19,7 +19,7 @@ router.post("/auth/register", registerUser);
 router.post("/auth/login", loginUser);
 router.post("/auth/logout", logoutUser);
 router.post("/auth/forgot-password", forgotPassword);
-router.post("/auth/reset-password", resetPassword);
+router.post("/auth/reset-password/:token", resetPassword);
 router.post("/auth/update-password", updatePassword);
 router.get("/auth/profile", withAuth, getProfile);
 router.patch("/auth/profile", updateProfile);

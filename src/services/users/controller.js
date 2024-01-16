@@ -1,4 +1,5 @@
 import BadRequestError from "../../errors/bad-request-error.js";
+import MailSender from "../../helpers/mail-sender.js";
 import sendResponse from "../../helpers/send-response.js";
 import { uploadImage } from "../../helpers/upload-image.js";
 import asyncWrapper from "../../middlewares/async-wrapper-middleware.js";
@@ -40,11 +41,28 @@ export const logoutUser = asyncWrapper(async (req, res) => {
 });
 
 export const forgotPassword = asyncWrapper(async (req, res) => {
+    const { email } = req.body;
+    const user = await User.getOne({ email });
+    const token = await user.getResetPasswordToken();
+    await user.save();
+
+    const mailSender = new MailSender();
+    mailSender.sendResetPasswordEmail(email, token);
     res.send("Forgot Password");
 });
 
 export const resetPassword = asyncWrapper(async (req, res) => {
-    res.send("Reset Password");
+    const { token } = req.params;
+    const { password } = req.body;
+    const user = await User.getByRestPasswordToken(token);
+    await user.updatePassword(password);
+
+    sendResponse({
+        res,
+        status: 200,
+        data: { user },
+        message: "Password reset successfully",
+    });
 });
 
 export const updatePassword = asyncWrapper(async (req, res) => {

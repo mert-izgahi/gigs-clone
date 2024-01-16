@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import config from "../../../config.js";
 import jwt from "jsonwebtoken";
 import BadRequestError from "../../errors/bad-request-error.js";
@@ -74,7 +75,27 @@ userSchema.methods.getResetPasswordToken = function () {
     this.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 min
     return resetToken;
 };
-
+userSchema.methods.updatePassword = async function (password) {
+    this.password = password;
+    this.resetPasswordToken = undefined;
+    this.resetPasswordExpire = undefined;
+    return this.save();
+};
+userSchema.statics.getByRestPasswordToken = async function (token) {
+    // decode token
+    const decodedToken = await crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+    const user = await this.findOne({
+        resetPasswordToken: decodedToken,
+        resetPasswordExpire: { $gt: Date.now() },
+    });
+    if (!user) {
+        throw new BadRequestError("Invalid token, please try again");
+    }
+    return user;
+};
 userSchema.statics.createUser = async function (data) {
     const { email } = data;
     const userDoc = await this.findOne({ email });

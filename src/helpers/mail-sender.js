@@ -1,5 +1,5 @@
 import config from "../../config.js";
-
+import nodemailer from "nodemailer";
 class MailSender {
     constructor() {
         this.transporter = nodemailer.createTransport({
@@ -23,3 +23,5 @@ class MailSender {
         return this.transporter.sendMail(mailOptions);
     }
 }
+
+export default MailSender;
