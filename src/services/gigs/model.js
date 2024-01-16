@@ -56,6 +56,22 @@ const gigSchema = new mongoose.Schema(
     }
 );
 
+gigSchema.statics.getAll = async function (query) {
+    const { limit, skip, sort, search } = query;
+
+    const gigs = await this.find(search).limit(limit).skip(skip).sort(sort);
+
+    if (!gigs) {
+        throw new BadRequestError("Gigs not found");
+    }
+
+    const totalPages = Math.ceil(
+        (await this.find(search).countDocuments()) / limit
+    );
+
+    return { gigs, totalPages };
+};
+
 gigSchema.set("toJSON", { virtuals: true });
 gigSchema.set("toObject", { virtuals: true });
 

@@ -837,3 +837,56 @@ router.delete("/gigs/:id", deleteGig);
 
 export default router;
 ```
+
+### Get All Gigs Services
+
+```js
+// ./src/services/gigs/model.js
+gigSchema.statics.getAll = async function (query) {
+    const { limit, skip, sort, search } = query;
+
+    const gigs = await this.find(search).limit(limit).skip(skip).sort(sort);
+
+    if (!gigs) {
+        throw new BadRequestError("Gigs not found");
+    }
+
+    const totalPages = Math.ceil(
+        (await this.find(search).countDocuments()) / limit
+    );
+
+    return { gigs, totalPages };
+};
+```
+
+```js
+// ./src/services/gigs/controller.js
+export const getAllGigs = asyncWrapper(async (req, res) => {
+    const { limit, page, sort, search, category } = req.query;
+
+    const skip = (page - 1) * limit;
+    const queryObj = {
+        page: page || 1,
+        limit: limit || 10,
+        sort: sort || "-createdAt",
+    };
+
+    if (category) {
+        queryObj.category = category;
+    }
+
+    if (search) {
+        queryObj.search = { title: { $regex: search, $options: "i" } };
+    }
+
+    const { gigs, totalPages } = await Gig.getAll(queryObj);
+    sendResponse({
+        res,
+        status: 200,
+        data: { gigs, totalPages },
+        message: "Gigs fetched successfully",
+    });
+});
+```
+
+### Get Gig Service
