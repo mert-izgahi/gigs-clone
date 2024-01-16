@@ -62,11 +62,27 @@ export const getProfile = asyncWrapper(async (req, res) => {
 });
 
 export const updateProfile = asyncWrapper(async (req, res) => {
-    res.send("Update Profile");
+    const userId = res.locals.user?.id;
+
+    const user = await User.updateOne({ _id: userId }, req.body);
+    sendResponse({
+        res,
+        status: 200,
+        data: { user },
+        message: "Profile updated successfully",
+    });
 });
 
 export const deleteUser = asyncWrapper(async (req, res) => {
-    res.send("Delete User");
+    const { id } = req.params;
+    const user = await User.deleteOne({ _id: id });
+
+    sendResponse({
+        res,
+        status: 200,
+        data: { user },
+        message: "User deleted successfully",
+    });
 });
 
 export const getAllUsers = asyncWrapper(async (req, res) => {

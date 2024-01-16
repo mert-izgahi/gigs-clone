@@ -22,7 +22,7 @@ router.post("/auth/forgot-password", forgotPassword);
 router.post("/auth/reset-password", resetPassword);
 router.post("/auth/update-password", updatePassword);
 router.get("/auth/profile", withAuth, getProfile);
-router.put("/auth/profile", updateProfile);
+router.patch("/auth/profile", updateProfile);
 router.delete("/users/:id", deleteUser);
 router.get("/users", getAllUsers);
 router.get("/users/:id", getUser);

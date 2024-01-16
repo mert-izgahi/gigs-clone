@@ -6,6 +6,10 @@ const errorHandler = (error, req, res, next) => {
         500
     );
     console.log("💥", error.message, error.name);
+    if (error.name === "BadRequestError") {
+        baseError.status = 400;
+        baseError.message = error.message;
+    }
     if (error.name === "ValidationError") {
         const keys = Object.keys(error.errors);
         keys.forEach((key) => {

@@ -1,4 +1,5 @@
 import express from "express";
+import formData from "express-form-data";
 import config from "./config.js";
 import connectDB from "./src/helpers/connect-db.js";
 import errorHandler from "./src/middlewares/error-handler-middleware.js";
@@ -9,6 +10,7 @@ import { router as usersRouter } from "./src/services/users/router.js";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(formData.parse());
 app.use(serializeUser);
 app.get("/", (req, res) => {
     res.send("Hello World!");
