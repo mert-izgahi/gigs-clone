@@ -7,6 +7,7 @@ export const serializeUser = (req, res, next) => {
         const authorization = headers.authorization;
 
         if (!authorization) {
+            res.locals.user = null;
             return next();
         }
 

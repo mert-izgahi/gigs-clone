@@ -88,11 +88,11 @@ userSchema.statics.createUser = async function (data) {
 userSchema.statics.getByCredentials = async function (email, password) {
     const user = await this.findOne({ email }).select("+password");
     if (!user) {
-        throw new BadRequestError("Invalid credentials");
+        throw new BadRequestError("Invalid credentials,please try again");
     }
     const isMatch = await user.isValidPassword(password);
     if (!isMatch) {
-        throw new BadRequestError("Invalid credentials");
+        throw new BadRequestError("Invalid credentials,please try again");
     }
     return user;
 };

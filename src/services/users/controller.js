@@ -1,3 +1,4 @@
+import BadRequestError from "../../errors/bad-request-error.js";
 import sendResponse from "../../helpers/send-response.js";
 import asyncWrapper from "../../middlewares/async-wrapper-middleware.js";
 import User from "./model.js";
@@ -12,7 +13,25 @@ export const registerUser = asyncWrapper(async (req, res) => {
 });
 
 export const loginUser = asyncWrapper(async (req, res) => {
-    res.send("Login User");
+    const { email, password } = req.body;
+    const user = await User.getByCredentials(email, password);
+    if (!user) {
+        throw new BadRequestError("Invalid credentials,please try again");
+    }
+    const token = await user.getSignedJwtToken();
+
+    if (!token) {
+        throw new BadRequestError("Invalid credentials,please try again");
+    }
+
+    user.password = undefined;
+
+    sendResponse({
+        res,
+        status: 200,
+        data: { user, token },
+        message: "User logged in successfully",
+    });
 });
 
 export const logoutUser = asyncWrapper(async (req, res) => {
@@ -32,7 +51,14 @@ export const updatePassword = asyncWrapper(async (req, res) => {
 });
 
 export const getProfile = asyncWrapper(async (req, res) => {
-    res.send("Get Profile");
+    const userId = res.locals.user?.id;
+    const profile = await User.getOne({ _id: userId });
+    sendResponse({
+        res,
+        status: 200,
+        data: { profile },
+        message: "Profile fetched successfully",
+    });
 });
 
 export const updateProfile = asyncWrapper(async (req, res) => {

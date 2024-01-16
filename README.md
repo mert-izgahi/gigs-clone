@@ -183,12 +183,14 @@ export const serializeUser = (req, res, next) => {
         const authorization = headers.authorization;
 
         if (!authorization) {
+            res.locals.user = null;
             return next();
         }
 
         const token = authorization.split(" ")[1];
 
         if (!token) {
+            res.locals.user = null;
             return next();
         }
 
@@ -206,18 +208,14 @@ export const serializeUser = (req, res, next) => {
 // ./src/middlewares/with-auth-middleware.js
 import AuthenticationError from "../errors/authentication-error";
 
-export const withAuth = (func) => {
-    return (req, res, next) => {
-        const user = res.locals.user;
+import AuthenticationError from "../errors/authentication-error.js";
 
-        if (!user) {
-            throw new AuthenticationError(
-                "Invalid token. Please log in again."
-            );
-        }
-
-        next();
-    };
+export const withAuth = (req, res, next) => {
+    const user = res.locals.user;
+    if (!user) {
+        throw new AuthenticationError("Invalid token. Please log in again.");
+    }
+    next();
 };
 ```
 
@@ -493,5 +491,59 @@ app.listen(PORT, async () => {
     app.use("/api/v1", usersRouter);
     // ...
     console.log(`Server started on http://localhost:${PORT}`);
+});
+```
+
+#### Register User
+
+```js
+export const registerUser = asyncWrapper(async (req, res) => {
+    const user = await User.createUser(req.body);
+    return sendResponse({
+        res,
+        status: 201,
+        data: { user },
+        message: "User created successfully",
+    });
+});
+```
+
+and fix error handler
+
+````js
+console.log("💥", baseError.message, error.name);
+    if (error.name === "ValidationError") {
+        const keys = Object.keys(error.errors);
+        keys.forEach((key) => {
+            baseError.message = error.errors[key].message;
+            baseError.status = 400;
+        });
+    }
+    ```
+````
+
+### Login User Services
+
+```js
+export const loginUser = asyncWrapper(async (req, res) => {
+    const { email, password } = req.body;
+    const user = await User.getByCredentials(email, password);
+    if (!user) {
+        throw new BadRequestError("Invalid credentials,please try again");
+    }
+    const token = await user.getSignedJwtToken();
+
+    if (!token) {
+        throw new BadRequestError("Invalid credentials,please try again");
+    }
+
+    user.password = undefined;
+
+    sendResponse({
+        res,
+        status: 200,
+        data: { user, token },
+        message: "User logged in successfully",
+    });
 });
 ```
