@@ -15,16 +15,16 @@ import {
 
 const router = express.Router();
 
-router.post("/register", registerUser);
-router.post("/login", loginUser);
-router.post("/logout", logoutUser);
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
-router.post("/update-password", updatePassword);
-router.get("/profile", getProfile);
-router.put("/profile", updateProfile);
-router.delete("/:id", deleteUser);
-router.get("/", getAllUsers);
-router.get("/:id", getUser);
+router.post("/auth/register", registerUser);
+router.post("/auth/login", loginUser);
+router.post("/auth/logout", logoutUser);
+router.post("/auth/forgot-password", forgotPassword);
+router.post("/auth/reset-password", resetPassword);
+router.post("/auth/update-password", updatePassword);
+router.get("/auth/profile", getProfile);
+router.put("/auth/profile", updateProfile);
+router.delete("/users/:id", deleteUser);
+router.get("/users", getAllUsers);
+router.get("/users/:id", getUser);
 
-export default router;
+export { router };

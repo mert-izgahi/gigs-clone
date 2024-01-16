@@ -1,7 +1,14 @@
+import sendResponse from "../../helpers/send-response.js";
 import asyncWrapper from "../../middlewares/async-wrapper-middleware.js";
-import { createUser } from "./model.js";
+import User from "./model.js";
 export const registerUser = asyncWrapper(async (req, res) => {
-    res.send("Create User");
+    const user = await User.createUser(req.body);
+    return sendResponse({
+        res,
+        status: 201,
+        data: { user },
+        message: "User created successfully",
+    });
 });
 
 export const loginUser = asyncWrapper(async (req, res) => {

@@ -8,15 +8,17 @@ const userSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: true,
+            required: [true, "Please provide name"],
+            trim: true,
         },
         email: {
             type: String,
-            required: true,
+            required: [true, "Please provide email"],
+            unique: [true, "Email already exists"],
         },
         password: {
             type: String,
-            required: true,
+            required: [true, "Please provide password"],
             select: false,
         },
         image: {
@@ -47,7 +49,8 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", async function (next) {
     if (this.isModified("password")) {
-        this.password = await bcrypt.hash(this.password, config.SALT_ROUNDS);
+        const salt = Number(config.SALT_ROUNDS) || 10;
+        this.password = await bcrypt.hash(this.password, salt);
     }
     next();
 });
@@ -139,4 +142,6 @@ userSchema.statics.updateOne = async function (query, data) {
 userSchema.set("toJSON", { virtuals: true });
 userSchema.set("toObject", { virtuals: true });
 
-export default mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+
+export default User;

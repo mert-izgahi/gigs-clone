@@ -402,7 +402,7 @@ userSchema.statics.getOne = async function (query) {
 ```js
 // ./src/services/users/controller.js
 import asyncWrapper from "../../middlewares/async-wrapper-middleware.js";
-import { createUser } from "./model.js";
+
 export const registerUser = asyncWrapper(async (req, res) => {
     res.send("Create User");
 });
@@ -480,5 +480,18 @@ router.delete("/:id", deleteUser);
 router.get("/", getAllUsers);
 router.get("/:id", getUser);
 
-export default router;
+export { router };
+```
+
+### Register User Services
+
+```js
+// ./index.js
+app.listen(PORT, async () => {
+    // ...
+    // ROUTERS
+    app.use("/api/v1", usersRouter);
+    // ...
+    console.log(`Server started on http://localhost:${PORT}`);
+});
 ```
