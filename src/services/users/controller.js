@@ -1,5 +1,6 @@
 import BadRequestError from "../../errors/bad-request-error.js";
 import sendResponse from "../../helpers/send-response.js";
+import { uploadImage } from "../../helpers/upload-image.js";
 import asyncWrapper from "../../middlewares/async-wrapper-middleware.js";
 import User from "./model.js";
 export const registerUser = asyncWrapper(async (req, res) => {
@@ -63,7 +64,16 @@ export const getProfile = asyncWrapper(async (req, res) => {
 
 export const updateProfile = asyncWrapper(async (req, res) => {
     const userId = res.locals.user?.id;
+    const image = req.files?.image;
 
+    if (image) {
+        if (Array.isArray(image)) {
+            throw new BadRequestError("Please upload only one image");
+        }
+
+        const secure_url = await uploadImage(image);
+        req.body.image = secure_url;
+    }
     const user = await User.updateOne({ _id: userId }, req.body);
     sendResponse({
         res,
