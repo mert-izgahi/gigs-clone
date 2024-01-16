@@ -1,54 +1,46 @@
 import mongoose from "mongoose";
 import BadRequestError from "../../errors/bad-request-error.js";
 
-const orderSchema = new mongoose.Schema(
+const conversationSchema = new mongoose.Schema(
     {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: [true, "Please provide user"],
+        },
         gig: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Gig",
             required: [true, "Please provide gig"],
         },
-        image: {
-            type: String,
-            default: null,
-        },
-        requestedBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: [true, "Please provide user"],
-        },
-        receivedBy: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            required: [true, "Please provide user"],
-        },
-        price: {
-            type: Number,
-            required: [true, "Please provide price"],
-        },
-        isPaid: {
-            type: Boolean,
-            default: false,
-        },
 
-        status: {
-            type: String,
-            enum: ["pending", "accepted", "rejected", "completed"],
-            default: "pending",
-        },
+        messages: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Message",
+            },
+        ],
+
+        readBy: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+
+        unreadBy: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
     },
     {
         timestamps: true,
     }
 );
 
-orderSchema.pre(/^find/, function (next) {
-    this.populate("requestedBy");
-    this.populate("receivedBy");
-    next();
-});
-
-orderSchema.statics.getAll = async function (query) {
+conversationSchema.statics.getAll = async function (query) {
     const { limit, skip, sort, search } = query;
 
     const orders = await this.find(search).limit(limit).skip(skip).sort(sort);
@@ -64,7 +56,7 @@ orderSchema.statics.getAll = async function (query) {
     return { orders, totalPages };
 };
 
-orderSchema.statics.createOne = async function (data) {
+conversationSchema.statics.createOne = async function (data) {
     const order = await this.create(data);
     if (!order) {
         throw new BadRequestError("Order not created");
@@ -73,7 +65,7 @@ orderSchema.statics.createOne = async function (data) {
     return order;
 };
 
-orderSchema.statics.updateOne = async function (query, data) {
+conversationSchema.statics.updateOne = async function (query, data) {
     const order = await this.findOneAndUpdate(query, data, {
         new: true,
     });
@@ -83,7 +75,7 @@ orderSchema.statics.updateOne = async function (query, data) {
     return order;
 };
 
-orderSchema.statics.getOne = async function (query) {
+conversationSchema.statics.getOne = async function (query) {
     const order = await this.findOne(query).populate("user");
     if (!order) {
         throw new BadRequestError("Order not found");
@@ -91,7 +83,7 @@ orderSchema.statics.getOne = async function (query) {
     return order;
 };
 
-orderSchema.statics.deleteOne = async function (query) {
+conversationSchema.statics.deleteOne = async function (query) {
     const order = await this.findOneAndDelete(query);
     if (!order) {
         throw new BadRequestError("Order not deleted");
@@ -99,9 +91,9 @@ orderSchema.statics.deleteOne = async function (query) {
     return order;
 };
 
-orderSchema.set("toJSON", { virtuals: true });
-orderSchema.set("toObject", { virtuals: true });
+conversationSchema.set("toJSON", { virtuals: true });
+conversationSchema.set("toObject", { virtuals: true });
 
-const Order = mongoose.model("Order", orderSchema);
+const Order = mongoose.model("Order", conversationSchema);
 
 export default Order;
