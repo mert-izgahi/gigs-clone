@@ -547,3 +547,18 @@ export const loginUser = asyncWrapper(async (req, res) => {
     });
 });
 ```
+
+### Get Profile Service
+
+```js
+export const getProfile = asyncWrapper(async (req, res) => {
+    const userId = res.locals.user?.id;
+    const profile = await User.getOne({ _id: userId });
+    sendResponse({
+        res,
+        status: 200,
+        data: { profile },
+        message: "Profile fetched successfully",
+    });
+});
+```
