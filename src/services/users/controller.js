@@ -66,7 +66,17 @@ export const resetPassword = asyncWrapper(async (req, res) => {
 });
 
 export const updatePassword = asyncWrapper(async (req, res) => {
-    res.send("Update Password");
+    const { password } = req.body;
+    const userId = res.locals.user?.id;
+    const user = await User.getOne({ _id: userId });
+    await user.updatePassword(password);
+
+    sendResponse({
+        res,
+        status: 200,
+        data: { user },
+        message: "Password updated successfully",
+    });
 });
 
 export const getProfile = asyncWrapper(async (req, res) => {
