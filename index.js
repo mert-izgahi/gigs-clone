@@ -6,6 +6,7 @@ import errorHandler from "./src/middlewares/error-handler-middleware.js";
 import notFound from "./src/middlewares/not-found-middleware.js";
 import { serializeUser } from "./src/middlewares/serialize-user-middleware.js";
 import { router as usersRouter } from "./src/services/users/router.js";
+import { router as gigsRouter } from "./src/services/gigs/router.js";
 
 const app = express();
 app.use(express.json());
@@ -27,6 +28,7 @@ app.listen(PORT, async () => {
 
     // ROUTERS
     app.use("/api/v1", usersRouter);
+    app.use("/api/v1", gigsRouter);
     app.use(errorHandler);
     app.use(notFound);
     console.log(`Server started on http://localhost:${PORT}`);

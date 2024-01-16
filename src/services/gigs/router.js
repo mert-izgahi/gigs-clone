@@ -15,4 +15,4 @@ router.post("/gigs", createGig);
 router.patch("/gigs/:id", updateGig);
 router.delete("/gigs/:id", deleteGig);
 
-export default router;
+export { router };
