@@ -106,8 +106,8 @@ userSchema.statics.getOne = async function (query) {
 };
 
 userSchema.statics.getAll = async function (query) {
-    const { limit, page, sort, search } = query;
-    const skip = (page - 1) * limit;
+    const { limit, skip, sort, search } = query;
+
     const users = await this.find(search).limit(limit).skip(skip).sort(sort);
 
     if (!users) {

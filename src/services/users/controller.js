@@ -70,7 +70,28 @@ export const deleteUser = asyncWrapper(async (req, res) => {
 });
 
 export const getAllUsers = asyncWrapper(async (req, res) => {
-    res.send("Get All Users");
+    const { limit, page, sort, search } = req.query;
+    const skip = (page - 1) * limit;
+    let queryObj = {
+        page: page || 1,
+        limit: limit || 10,
+        sort: sort || "createdAt",
+    };
+
+    if (search) {
+        queryObj = {
+            ...queryObj,
+            search: { name: { $regex: search, $options: "i" } },
+        };
+    }
+
+    const { users } = await User.getAll(queryObj);
+    sendResponse({
+        res,
+        status: 200,
+        data: { users },
+        message: "Users fetched successfully",
+    });
 });
 
 export const getUser = asyncWrapper(async (req, res) => {

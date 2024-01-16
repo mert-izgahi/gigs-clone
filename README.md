@@ -562,3 +562,51 @@ export const getProfile = asyncWrapper(async (req, res) => {
     });
 });
 ```
+
+### Get All Users Service
+
+```js
+// ./src/services/users/model.js
+userSchema.statics.getAll = async function (query) {
+    const { limit, skip, sort, search } = query;
+
+    const users = await this.find(search).limit(limit).skip(skip).sort(sort);
+
+    if (!users) {
+        throw new BadRequestError("Users not found");
+    }
+
+    const totalPages = Math.ceil(
+        (await this.find(search).countDocuments()) / limit
+    );
+
+    return { users, totalPages };
+};
+```
+
+```js
+export const getAllUsers = asyncWrapper(async (req, res) => {
+    const { limit, page, sort, search } = req.query;
+    const skip = (page - 1) * limit;
+    let queryObj = {
+        page: page || 1,
+        limit: limit || 10,
+        sort: sort || "createdAt",
+    };
+
+    if (search) {
+        queryObj = {
+            ...queryObj,
+            search: { name: { $regex: search, $options: "i" } },
+        };
+    }
+
+    const { users } = await User.getAll(queryObj);
+    sendResponse({
+        res,
+        status: 200,
+        data: { users },
+        message: "Users fetched successfully",
+    });
+});
+```
