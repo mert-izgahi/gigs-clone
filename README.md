@@ -610,3 +610,18 @@ export const getAllUsers = asyncWrapper(async (req, res) => {
     });
 });
 ```
+
+### Get User Service
+
+```js
+export const getUser = asyncWrapper(async (req, res) => {
+    const { id } = req.params;
+    const user = await User.getOne({ _id: id });
+    sendResponse({
+        res,
+        status: 200,
+        data: { user },
+        message: "User fetched successfully",
+    });
+});
+```

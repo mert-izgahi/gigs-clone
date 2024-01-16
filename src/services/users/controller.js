@@ -95,5 +95,12 @@ export const getAllUsers = asyncWrapper(async (req, res) => {
 });
 
 export const getUser = asyncWrapper(async (req, res) => {
-    res.send("Get User");
+    const { id } = req.params;
+    const user = await User.getOne({ _id: id });
+    sendResponse({
+        res,
+        status: 200,
+        data: { user },
+        message: "User fetched successfully",
+    });
 });
