@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import BadRequestError from "../../errors/bad-request-error.js";
 
 const gigSchema = new mongoose.Schema(
     {
@@ -70,6 +71,41 @@ gigSchema.statics.getAll = async function (query) {
     );
 
     return { gigs, totalPages };
+};
+
+gigSchema.statics.createOne = async function (data) {
+    const gig = await this.create(data);
+    if (!gig) {
+        throw new BadRequestError("Gig not created");
+    }
+
+    return gig;
+};
+
+gigSchema.statics.updateOne = async function (query, data) {
+    const gig = await this.findOneAndUpdate(query, data, {
+        new: true,
+    });
+    if (!gig) {
+        throw new BadRequestError("Gig not updated");
+    }
+    return gig;
+};
+
+gigSchema.statics.deleteOne = async function (query) {
+    const gig = await this.findOneAndDelete(query);
+    if (!gig) {
+        throw new BadRequestError("Gig not deleted");
+    }
+    return gig;
+};
+
+gigSchema.statics.getOne = async function (query) {
+    const gig = await this.findOne(query).populate("user");
+    if (!gig) {
+        throw new BadRequestError("Gig not found");
+    }
+    return gig;
 };
 
 gigSchema.set("toJSON", { virtuals: true });
