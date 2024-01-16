@@ -338,3 +338,61 @@ userSchema.methods.getResetPasswordToken = function () {
     return resetToken;
 };
 ```
+
+### User Base Controllers
+
+```js
+userSchema.statics.createUser = async function (data) {
+    const { email } = data;
+    const userDoc = await this.findOne({ email });
+    if (userDoc) {
+        throw new BadRequestError("User already exists");
+    }
+    const user = await this.create(data);
+    return user;
+};
+
+userSchema.statics.findByCredentials = async function (email, password) {
+    const user = await this.findOne({ email }).select("+password");
+    if (!user) {
+        throw new BadRequestError("Invalid credentials");
+    }
+    const isMatch = await user.isValidPassword(password);
+    if (!isMatch) {
+        throw new BadRequestError("Invalid credentials");
+    }
+    return user;
+};
+```
+
+```js
+userSchema.statics.createUser = async function (data) {
+    const { email } = data;
+    const userDoc = await this.findOne({ email });
+    if (userDoc) {
+        throw new BadRequestError("User already exists");
+    }
+    const user = await this.create(data);
+    return user;
+};
+
+userSchema.statics.getByCredentials = async function (email, password) {
+    const user = await this.findOne({ email }).select("+password");
+    if (!user) {
+        throw new BadRequestError("Invalid credentials");
+    }
+    const isMatch = await user.isValidPassword(password);
+    if (!isMatch) {
+        throw new BadRequestError("Invalid credentials");
+    }
+    return user;
+};
+
+userSchema.statics.getOne = async function (query) {
+    const user = await this.findOne(query);
+    if (!user) {
+        throw new BadRequestError("User not found");
+    }
+    return user;
+};
+```
