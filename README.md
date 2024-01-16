@@ -718,3 +718,122 @@ userSchema.statics.getByRestToken = async function (token) {
     return user;
 };
 ```
+
+### Gig Model
+
+```js
+// ./src/services/gigs/model.js
+import mongoose from "mongoose";
+
+const gigSchema = new mongoose.Schema(
+    {
+        title: {
+            type: String,
+            required: [true, "Please provide title"],
+        },
+        description: {
+            type: String,
+            required: [true, "Please provide description"],
+        },
+        rating: {
+            type: Number,
+            default: 0,
+        },
+        reviewsCount: {
+            type: Number,
+            default: 0,
+        },
+        price: {
+            type: Number,
+            required: [true, "Please provide price"],
+            default: 0,
+        },
+        coverImage: {
+            type: String,
+            default: null,
+        },
+        category: {
+            type: String,
+            required: [true, "Please provide category"],
+            enum: {
+                values: [
+                    "Graphics & Design",
+                    "Video & Animation",
+                    "Music & Audio",
+                    "Writing & Translation",
+                    "Programming & Tech",
+                    "Business",
+                    "Lifestyle",
+                    "Data",
+                    "Other",
+                ],
+                message: "{VALUE} is not supported",
+            },
+        },
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: [true, "Please provide user"],
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+gigSchema.set("toJSON", { virtuals: true });
+gigSchema.set("toObject", { virtuals: true });
+
+const Gig = mongoose.model("Gig", gigSchema);
+
+export default Gig;
+```
+
+### Gig Controller
+
+```js
+// ./src/services/gigs/controller.js
+import asyncWrapper from "../../middlewares/async-wrapper-middleware.js";
+export const getAllGigs = asyncWrapper(async (req, res) => {
+    res.send("Get All Gigs");
+});
+
+export const getGig = asyncWrapper(async (req, res) => {
+    res.send("Get Gig");
+});
+
+export const createGig = asyncWrapper(async (req, res) => {
+    res.send("Create Gig");
+});
+
+export const updateGig = asyncWrapper(async (req, res) => {
+    res.send("Update Gig");
+});
+
+export const deleteGig = asyncWrapper(async (req, res) => {
+    res.send("Delete Gig");
+});
+```
+
+# Gig Routes
+
+```js
+import express from "express";
+import {
+    getAllGigs,
+    getGig,
+    createGig,
+    updateGig,
+    deleteGig,
+} from "./controller.js";
+
+const router = express.Router();
+
+router.get("/gigs", getAllGigs);
+router.get("/gigs/:id", getGig);
+router.post("/gigs", createGig);
+router.patch("/gigs/:id", updateGig);
+router.delete("/gigs/:id", deleteGig);
+
+export default router;
+```
