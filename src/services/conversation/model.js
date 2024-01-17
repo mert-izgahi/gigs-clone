@@ -15,47 +15,47 @@ const conversationSchema = new mongoose.Schema(
             required: [true, "Please provide order"],
         },
 
-        // messages: [
-        //     {
-        //         type: {
-        //             type: String,
-        //             enum: ["Message"],
-        //             default: "Message",
-        //         },
-
-        //         message: {
-        //             type: String,
-        //             required: [true, "Please provide message"],
-        //         },
-
-        //         sender: {
-        //             type: mongoose.Schema.Types.ObjectId,
-        //             ref: "User",
-        //             required: [true, "Please provide user"],
-        //         },
-
-        //         receiver: {
-        //             type: mongoose.Schema.Types.ObjectId,
-        //             ref: "User",
-        //             required: [true, "Please provide user"],
-        //         },
-
-        //         isRead: {
-        //             type: Boolean,
-        //             default: false,
-        //         },
-
-        //         createdAt: {
-        //             type: Date,
-        //             default: Date.now,
-        //         },
-        //     },
-        // ],
+        users: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
     },
     {
         timestamps: true,
     }
 );
+
+conversationSchema.virtual("messages", {
+    ref: "Message",
+    localField: "_id",
+    foreignField: "conversation",
+});
+
+conversationSchema.virtual("messagesCount", {
+    ref: "Message",
+    localField: "_id",
+    foreignField: "conversation",
+    count: true,
+});
+
+conversationSchema.virtual("unreadMessagesCount", {
+    ref: "Message",
+    localField: "_id",
+    foreignField: "conversation",
+    count: true,
+    match: {
+        isRead: false,
+    },
+});
+
+conversationSchema.pre(/^findOne/, function (next) {
+    this.populate("messages");
+    this.populate("unreadMessagesCount");
+    this.populate("messagesCount");
+    next();
+});
 
 conversationSchema.statics.createOne = async function (data) {
     const conversation = await this.create(data);

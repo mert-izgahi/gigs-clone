@@ -9,6 +9,7 @@ import { router as usersRouter } from "./src/services/users/router.js";
 import { router as gigsRouter } from "./src/services/gigs/router.js";
 import { router as ordersRouter } from "./src/services/orders/router.js";
 import { router as conversationRouter } from "./src/services/conversation/router.js";
+import { router as messagesRouter } from "./src/services/messages/router.js";
 
 const app = express();
 app.use(express.json());
@@ -33,6 +34,7 @@ app.listen(PORT, async () => {
     app.use("/api/v1", gigsRouter);
     app.use("/api/v1", ordersRouter);
     app.use("/api/v1", conversationRouter);
+    app.use("/api/v1", messagesRouter);
     app.use(errorHandler);
     app.use(notFound);
     console.log(`Server started on http://localhost:${PORT}`);

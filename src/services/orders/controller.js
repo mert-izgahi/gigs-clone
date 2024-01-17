@@ -74,6 +74,7 @@ export const createOrder = asyncWrapper(async (req, res) => {
     const conversation = await Conversation.createOne({
         gig: gig._id,
         order: order._id,
+        users: [userId, gig.user],
     });
 
     order.conversation = conversation._id;
