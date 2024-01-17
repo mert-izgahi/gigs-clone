@@ -36,6 +36,12 @@ const orderSchema = new mongoose.Schema(
             enum: ["pending", "accepted", "rejected", "completed"],
             default: "pending",
         },
+
+        conversation: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Conversation",
+            default: null,
+        },
     },
     {
         timestamps: true,

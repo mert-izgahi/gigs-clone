@@ -8,6 +8,7 @@ import { serializeUser } from "./src/middlewares/serialize-user-middleware.js";
 import { router as usersRouter } from "./src/services/users/router.js";
 import { router as gigsRouter } from "./src/services/gigs/router.js";
 import { router as ordersRouter } from "./src/services/orders/router.js";
+import { router as conversationRouter } from "./src/services/conversation/router.js";
 
 const app = express();
 app.use(express.json());
@@ -31,6 +32,7 @@ app.listen(PORT, async () => {
     app.use("/api/v1", usersRouter);
     app.use("/api/v1", gigsRouter);
     app.use("/api/v1", ordersRouter);
+    app.use("/api/v1", conversationRouter);
     app.use(errorHandler);
     app.use(notFound);
     console.log(`Server started on http://localhost:${PORT}`);

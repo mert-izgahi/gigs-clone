@@ -2,6 +2,7 @@ import asyncWrapper from "../../middlewares/async-wrapper-middleware.js";
 import sendResponse from "../../helpers/send-response.js";
 import Order from "./model.js";
 import Gig from "../gigs/model.js";
+import Conversation from "../conversation/model.js";
 
 export const getRequestedOrders = asyncWrapper(async (req, res) => {
     // Current user orders list
@@ -70,6 +71,13 @@ export const createOrder = asyncWrapper(async (req, res) => {
         receivedBy: gig.user,
         price: gig.price,
     });
+    const conversation = await Conversation.createOne({
+        gig: gig._id,
+        order: order._id,
+    });
+
+    order.conversation = conversation._id;
+    await order.save();
 
     sendResponse({
         res,

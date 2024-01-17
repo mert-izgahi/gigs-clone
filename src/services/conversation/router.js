@@ -1,17 +1,13 @@
 import express from "express";
 import {
-    getAllOrders,
-    getOrder,
-    createOrder,
-    updateOrder,
-    deleteOrder,
+    getAllConversations,
+    getConversation,
+    deleteConversation,
 } from "./controller.js";
-
+import { withAuth } from "../../middlewares/with-auth-middleware.js";
 const router = express.Router();
 
-router.get("/orders", getAllOrders);
-router.get("/orders/:id", getOrder);
-router.post("/orders", createOrder);
-router.patch("/orders/:id", updateOrder);
-router.delete("/orders/:id", deleteOrder);
+router.get("/conversations", withAuth, getAllConversations);
+router.get("/conversations/:id", withAuth, getConversation);
+router.delete("/conversations/:id", withAuth, deleteConversation);
 export { router };
